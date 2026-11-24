@@ -38,14 +38,19 @@ jobs:
           java-version: 17
           cache: "gradle"
 
+      - name: Restore signing keystore
+        run: |
+          echo "${{ secrets.FCL_KEYSTORE_B64 }}" | base64 -d > key-store.jks
+          ls -l key-store.jks
+
       - name: Build release apk
-        if: ${{ github.repository_owner == 'FCL-Team' && github.event_name != 'pull_request' }}
+        if: ${{ github.event_name != 'pull_request' }}
         run: |
           chmod +x gradlew
           ./gradlew assemblerelease -Darch=${{ matrix.arch }} --no-daemon
 
       - name: Build debug apk
-        if: ${{ github.repository_owner != 'FCL-Team' || github.event_name == 'pull_request' }}
+        if: false
         run: |
           chmod +x gradlew
           ./gradlew assemblefordebug -Darch=${{ matrix.arch }} --no-daemon
